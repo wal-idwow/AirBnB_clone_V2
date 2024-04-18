@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """This module defines a class to manage file storage for hbnb clone"""
 import json
+from sqlalchemy.sql.expression import BinaryExpression
 
 
 class FileStorage:
@@ -8,12 +9,19 @@ class FileStorage:
     __file_path = 'file.json'
     __objects = {}
 
-    def all(self):
+    def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
-        return FileStorage.__objects
+        if cls:
+            filtered_objects = {}
+            for k, v in self.__objects.items():
+                if isinstance(v, cls):
+                    filtered_objects[k] = v
+            return filtered_objects
+        return self.__objects
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
+        print("Object ID:", obj.id)
         self.all().update({obj.to_dict()['__class__'] + '.' + obj.id: obj})
 
     def save(self):
@@ -22,6 +30,10 @@ class FileStorage:
             temp = {}
             temp.update(FileStorage.__objects)
             for key, val in temp.items():
+                if key == '_sa_instance_state':
+                    continue
+                if isinstance(key, BinaryExpression):
+                    continue
                 temp[key] = val.to_dict()
             json.dump(temp, f)
 
@@ -45,6 +57,12 @@ class FileStorage:
             with open(FileStorage.__file_path, 'r') as f:
                 temp = json.load(f)
                 for key, val in temp.items():
-                        self.all()[key] = classes[val['__class__']](**val)
+                    self.all()[key] = classes[val['__class__']](**val)
         except FileNotFoundError:
             pass
+
+    def delete(self, obj=None):
+        """Deletes obj from __objects if it's inside"""
+        if obj is not None:
+            key = "{}.{}".format(obj.__class__.__name__, obj.id)
+            self.__objects.pop(key, None)

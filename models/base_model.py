@@ -30,7 +30,7 @@ class BaseModel:
                 if key == 'updated_at' or key == 'created_at':
                     setattr(self, key, datetime.strptime(
                         value, '%Y-%m-%dT%H:%M:%S.%f'))
-                elif key != '__class__':
+                elif key != '__class__' and key != '_sa_instance_state':
                     setattr(self, key, value)
             if 'updated_at' not in kwargs.items():
                 self.updated_at = datetime.now()
@@ -39,6 +39,8 @@ class BaseModel:
 
             if '__class__' in kwargs:
                 del kwargs['__class__']
+            if '_sa_instance_state' in kwargs:
+                del kwargs['_sa_instance_state']
             self.__dict__.update(kwargs)
 
     def __str__(self):

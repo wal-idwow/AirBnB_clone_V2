@@ -14,8 +14,6 @@ class FileStorage:
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
-        print("adding new object to storage:", obj)
-        print("object dictioanry:", obj.to_dict())
         self.__objects.update(
             {obj.to_dict()['__class__'] + '.' + obj.id: obj}
             )

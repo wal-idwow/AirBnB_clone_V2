@@ -53,6 +53,3 @@ class BaseModel:
         dictionary["__class__"] = self.__class__.__name__
         return dictionary
 
-    # def delete(self, obj=None):
-    #     """"""
-        
